@@ -1,0 +1,44 @@
+.payment-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-page h1 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.payment-sub {
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.amount-opt {
+  padding: 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.amount-opt:hover {
+  border-color: var(--gold);
+}
+
+.back-link {
+  margin-top: 16px;
+  font-size: 14px;
+}

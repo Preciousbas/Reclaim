@@ -1,0 +1,17 @@
+{
+  "name": "ReClaim",
+  "short_name": "ReClaim",
+  "description": "Take back control — daily recovery check-ins and Becca AI companion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08051a",
+  "theme_color": "#08051a",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

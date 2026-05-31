@@ -1,0 +1,102 @@
+.checkin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.checkin-overlay.open { display: flex; }
+
+.checkin-sheet {
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #12072e;
+  border-radius: 24px 24px 0 0;
+  border: 1px solid var(--glass-border);
+  padding: 24px 20px 32px;
+}
+
+.checkin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.checkin-header h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.checkin-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.checkin-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 16px 0 10px;
+}
+
+.wl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.wl-btn {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wl-btn.win.sel { border-color: var(--success); background: rgba(110, 231, 183, 0.15); }
+.wl-btn.loss.sel { border-color: var(--danger); background: rgba(239, 68, 68, 0.15); }
+
+.int-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.int-btn {
+  padding: 8px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.int-btn.sel { background: var(--violet); border-color: var(--glow); color: #fff; }
+
+.mood-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.mo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.mo.sel { border-color: var(--gold); background: rgba(245, 197, 24, 0.12); }
+
+.checkin-save { margin-top: 20px; }
+
+textarea {
+  resize: vertical;
+  min-height: 64px;
+}

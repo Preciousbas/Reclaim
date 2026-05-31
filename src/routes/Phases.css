@@ -1,0 +1,111 @@
+.phases-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.phase-hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+.phase-medal {
+  font-size: 48px;
+}
+
+.phase-hero h1 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.phase-hero p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.phase-next {
+  margin-top: 6px;
+  color: var(--gold) !important;
+}
+
+.phase-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px;
+  opacity: 0.55;
+}
+
+.phase-card.ul {
+  opacity: 1;
+}
+
+.phase-card summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.phase-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.ph-ar {
+  margin-left: auto;
+}
+
+.phase-card p {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.milestone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ms-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--glass);
+  border-radius: 10px;
+  opacity: 0.5;
+}
+
+.ms-row.done {
+  opacity: 1;
+}
+
+.ms-row span:first-child {
+  font-size: 24px;
+}
+
+.ms-row strong {
+  display: block;
+  font-size: 14px;
+}
+
+.ms-row p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
+}

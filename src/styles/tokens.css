@@ -1,0 +1,21 @@
+:root {
+  --deep: #08051a;
+  --violet: #6c3fd6;
+  --glow: #a374ff;
+  --accent: #c8a8ff;
+  --gold: #f5c518;
+  --gold2: #e8a800;
+  --white: #f0eaff;
+  --warm: #ff9d6c;
+  --warm2: #ffb347;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --danger: #ef4444;
+  --success: #6ee7b7;
+  --font-display: 'Syne', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
