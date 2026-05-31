@@ -66,17 +66,38 @@ netlify dev
 3. Publish directory: `dist`
 4. Set `ANTHROPIC_API_KEY` in Netlify env
 5. Set `VITE_FIREBASE_*` in Netlify env (or commit `.env.example` values — they are public client config)
-6. Deploy Firestore rules: `firebase deploy --only firestore:rules,firestore:indexes`
+6. Deploy Firestore rules/indexes via Firebase CLI (see **Firebase setup** below)
 
 `netlify.toml` includes SPA fallback and `/api/chat` → function redirect.
 
-## Firebase setup (manual)
+## Firebase setup
 
-1. **Firebase Console** → project `your-firebase-project-id`
+### Console (one-time)
+
+1. **Firebase Console** → project `reclaim-d2b9e` (or your project id in `.firebaserc`)
 2. Enable **Email/Password** and **Google** sign-in providers
-3. Deploy rules from `firebase/firestore.rules`
-4. Deploy index from `firebase/firestore.indexes.json` (leaderboard `orderBy ri desc`)
-5. Optional: enable **App Check** for production hardening
+3. Add your Netlify URL under **Authentication → Settings → Authorized domains**
+4. Optional: enable **App Check** for production hardening
+
+### CLI — deploy Firestore rules & indexes
+
+Firebase CLI is included as a dev dependency (`firebase-tools`). From the project root:
+
+```bash
+npm install
+npx firebase login
+npm run firebase:deploy
+```
+
+This deploys `firebase/firestore.rules` and `firebase/firestore.indexes.json` to project `reclaim-d2b9e` (see `.firebaserc`).
+
+| Script | What it does |
+|--------|----------------|
+| `npm run firebase:deploy` | Rules + indexes |
+| `npm run firebase:deploy:rules` | Rules only |
+| `npm run firebase:deploy:indexes` | Indexes only |
+
+**Note:** Hosting stays on Netlify; Firebase deploy here is for Firestore security rules and the leaderboard index only.
 
 ## Critical fixes vs monolith
 
