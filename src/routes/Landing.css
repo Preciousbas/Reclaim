@@ -1,6 +1,12 @@
 .landing-page { overflow-y: auto; }
 
-.landing-inner { min-height: 100vh; padding: 60px 24px; }
+.landing-inner {
+  min-height: 100vh;
+  padding: 60px 24px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
 
 .hero-eyebrow {
   font-size: 14px;

@@ -22,7 +22,13 @@ export function AuthGuard({ children }) {
 
 export function PublicOnly({ children }) {
   const { authReady, hasProfile } = useUser();
-  if (!authReady) return null;
+  if (!authReady) {
+    return (
+      <div className="page-center">
+        <p>Loading…</p>
+      </div>
+    );
+  }
   if (hasProfile) return <Navigate to="/app/dashboard" replace />;
   return children;
 }

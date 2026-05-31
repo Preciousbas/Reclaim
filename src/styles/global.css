@@ -61,6 +61,13 @@ button, input, textarea, select {
   -webkit-overflow-scrolling: touch;
 }
 
+.page-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 100%;
+}
+
 .page-center {
   min-height: 100%;
   display: flex;

@@ -23,7 +23,7 @@ export function PageLayout({ children, className = '' }) {
   return (
     <div className={`page-shell ${className}`}>
       <AppBackground />
-      {children}
+      <div className="page-content">{children}</div>
     </div>
   );
 }
