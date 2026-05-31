@@ -72,7 +72,7 @@ netlify dev
 
 ## Firebase setup (manual)
 
-1. **Firebase Console** → project `reclaim-d2b9e`
+1. **Firebase Console** → project `your-firebase-project-id`
 2. Enable **Email/Password** and **Google** sign-in providers
 3. Deploy rules from `firebase/firestore.rules`
 4. Deploy index from `firebase/firestore.indexes.json` (leaderboard `orderBy ri desc`)
