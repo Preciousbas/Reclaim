@@ -7,7 +7,7 @@ export default function Whitepaper() {
   return (
     <PageLayout className="legal-page">
       <article className="legal-doc">
-        <Link to="/landing" className="legal-back">← Back</Link>
+        <Link to="/" className="legal-back">← Back</Link>
         <h1>{WHITEPAPER.title}</h1>
         {WHITEPAPER.sections.map((s) => (
           <section key={s.heading}>

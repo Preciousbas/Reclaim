@@ -23,7 +23,7 @@ export default function Splash() {
         <button
           type="button"
           className="enter-wrap"
-          onClick={() => navigate('/landing')}
+          onClick={() => navigate('/')}
           aria-label="Enter ReClaim"
         >
           <span className="enter-label">Enter</span>

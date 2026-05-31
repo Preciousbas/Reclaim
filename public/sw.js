@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reclaim-v1';
+const CACHE_NAME = 'reclaim-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -34,8 +34,4 @@ self.addEventListener('message', (e) => {
   }
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request).catch(() => caches.match('/index.html')));
-  }
-});
+// Navigation is handled by Netlify _redirects + React Router — no fetch interception

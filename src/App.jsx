@@ -20,8 +20,9 @@ export default function App() {
     <UserProvider>
       <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Splash />} />
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/landing" element={<Navigate to="/" replace />} />
+            <Route path="/splash" element={<Splash />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/signup/name" element={<NameSetup />} />
             <Route path="/learn" element={<Whitepaper />} />

@@ -1,0 +1,3 @@
+# Netlify SPA fallback — copied to dist/ on build (required for /landing, /signup, etc.)
+/api/chat  /.netlify/functions/chat  200
+/*         /index.html               200
