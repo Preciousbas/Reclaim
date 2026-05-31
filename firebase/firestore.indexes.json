@@ -1,12 +1,4 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "leaderboard",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "ri", "order": "DESCENDING" }
-      ]
-    }
-  ],
+  "indexes": [],
   "fieldOverrides": []
 }
