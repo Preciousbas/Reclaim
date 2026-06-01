@@ -2,7 +2,11 @@
   command = "npm run build"
   publish = "dist"
   functions = "netlify/functions"
-  SECRETS_SCAN_OMIT_PATHS = ".firebaserc"
+
+[build.environment]
+  # VITE_FIREBASE_* values are public client config (inlined into dist/) — not secret leaks
+  SECRETS_SCAN_OMIT_KEYS = "VITE_FIREBASE_API_KEY,VITE_FIREBASE_AUTH_DOMAIN,VITE_FIREBASE_PROJECT_ID,VITE_FIREBASE_STORAGE_BUCKET,VITE_FIREBASE_MESSAGING_SENDER_ID,VITE_FIREBASE_APP_ID,VITE_FIREBASE_MEASUREMENT_ID"
+  SECRETS_SCAN_OMIT_PATHS = "dist/**,.netlify/**,node_modules/**"
 
 [[redirects]]
   from = "/api/chat"

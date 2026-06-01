@@ -10,3 +10,4 @@ ui-debug.log
 *.log
 .DS_Store
 .env.example
+.firebaserc

@@ -9,9 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "firebase:deploy": "firebase deploy --only firestore:rules,firestore:indexes",
-    "firebase:deploy:rules": "firebase deploy --only firestore:rules",
-    "firebase:deploy:indexes": "firebase deploy --only firestore:indexes"
+    "firebase:deploy": "firebase deploy --only firestore:rules,firestore:indexes --project reclaim-6cb36",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules --project reclaim-6cb36",
+    "firebase:deploy:indexes": "firebase deploy --only firestore:indexes --project reclaim-6cb36"
   },
   "dependencies": {
     "firebase": "^11.6.0",
