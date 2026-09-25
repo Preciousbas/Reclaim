@@ -5,7 +5,7 @@ import { setItem, STORAGE_KEYS } from '../../lib/storage.js';
 import './CheckinModal.css';
 
 const INTENSITIES = ['Mild', 'Moderate', 'Strong', 'Overwhelming'];
-const MOODS = ['😊', '😐', '😔', '😤', '😰'];
+const MOODS = ['Calm', 'Neutral', 'Low', 'Frustrated', 'Anxious'];
 
 /**
  * Single check-in modal — the only modal with id checkin-modal in the app.
@@ -20,8 +20,7 @@ export default function CheckinModal({ open, day, stats, onClose, onSubmit }) {
 
   if (!open) return null;
 
-  const startDate = stats.startDate ? new Date(stats.startDate) : undefined;
-  const today = getJourneyDay(startDate);
+  const today = getJourneyDay(stats.startDate);
   const isToday = day === today;
   const ready = validateCheckinForm({ result, intensity, mood, trigger, action });
 
@@ -37,7 +36,7 @@ export default function CheckinModal({ open, day, stats, onClose, onSubmit }) {
       trigger,
       action,
       worked,
-      startDate,
+      startDate: stats.startDate,
       today,
     });
     if (outcome.error) {
@@ -67,12 +66,24 @@ export default function CheckinModal({ open, day, stats, onClose, onSubmit }) {
         </div>
 
         <div className="checkin-body">
+          <aside className="checkin-why">
+            <div className="checkin-why-title">Why this?</div>
+            <p>
+              After you tick win or lose, these fields help ReClaim understand your real triggers.
+              Your answers stay private and are analysed after your first 30 days — then you get a
+              personalised report on what to lean into and what to avoid.
+            </p>
+          </aside>
+
+          <div className="checkin-fields">
           <p className="checkin-label">Did you win or lose today?</p>
           <div className="wl-row">
-            <button type="button" className={`wl-btn win ${result === 'win' ? 'sel' : ''}`} id="checkin-win-btn" onClick={() => setResult('win')}>✅ Win</button>
-            <button type="button" className={`wl-btn loss ${result === 'loss' ? 'sel' : ''}`} id="checkin-loss-btn" onClick={() => setResult('loss')}>❌ Loss</button>
+            <button type="button" className={`wl-btn win ${result === 'win' ? 'sel' : ''}`} id="checkin-win-btn" onClick={() => setResult('win')}>Win</button>
+            <button type="button" className={`wl-btn loss ${result === 'loss' ? 'sel' : ''}`} id="checkin-loss-btn" onClick={() => setResult('loss')}>Loss</button>
           </div>
 
+          {result && (
+          <>
           <p className="checkin-label">Urge intensity</p>
           <div className="int-row">
             {INTENSITIES.map((v) => (
@@ -99,6 +110,9 @@ export default function CheckinModal({ open, day, stats, onClose, onSubmit }) {
             <label htmlFor="checkin-worked">What worked? (optional)</label>
             <textarea id="checkin-worked" rows={2} value={worked} onChange={(e) => setWorked(e.target.value)} placeholder="Anything that helped" />
           </div>
+          </>
+          )}
+          </div>
         </div>
 
         <button type="button" className="btn checkin-save" id="checkin-save-btn" disabled={!ready} onClick={handleSubmit}>
@@ -114,8 +128,7 @@ export function useCheckinModal(stats) {
   const [day, setDay] = useState(null);
 
   const openForDay = (d) => {
-    const startDate = stats.startDate ? new Date(stats.startDate) : undefined;
-    const target = d ?? getJourneyDay(startDate);
+    const target = d ?? getJourneyDay(stats.startDate);
     const k = dayKey(target);
     if (stats.checkins[k]) {
       alert(`You already checked in for Day ${target}.`);

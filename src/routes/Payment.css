@@ -7,7 +7,7 @@
 .payment-page h1 {
   font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 900;
+  font-weight: 500;
 }
 
 .payment-sub {
@@ -34,11 +34,124 @@
   cursor: pointer;
 }
 
-.amount-opt:hover {
+.amount-opt:hover:not(:disabled) {
   border-color: var(--gold);
+}
+
+.amount-opt:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .back-link {
   margin-top: 16px;
   font-size: 14px;
+  display: block;
+}
+
+.tier-grid {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+@media (min-width: 560px) {
+  .tier-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.tier-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.tier-supporter {
+  border-color: rgba(201, 168, 108, 0.35);
+  background: rgba(201, 168, 108, 0.06);
+}
+
+.tier-card h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.tier-price {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.tier-card h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 10px 0 6px;
+}
+
+.tier-card ul {
+  padding-left: 16px;
+  margin: 0;
+}
+
+.tier-card li {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tier-limits li {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.plan-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.plan-note {
+  margin: 0 0 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(239, 232, 220, 0.62);
+}
+
+.tier-cta {
+  margin-top: 0;
+}
+
+.plan-actions .btn-ghost {
+  margin-top: 0;
+}
+
+.pay-status {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pay-status-ok {
+  color: var(--white);
+  background: rgba(138, 154, 124, 0.16);
+  border: 1px solid rgba(138, 154, 124, 0.4);
+}
+
+.pay-status-err {
+  color: var(--white);
+  background: rgba(184, 106, 88, 0.14);
+  border: 1px solid rgba(184, 106, 88, 0.4);
+}
+
+.donate-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin-top: 8px;
 }

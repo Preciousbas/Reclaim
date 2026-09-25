@@ -111,10 +111,10 @@ export default function Emergency() {
             ))}
           </ol>
           <button type="button" className="em-action-btn walk" onClick={openMapsWalk}>
-            🚶 Open maps — walk somewhere else
+            Open maps — walk somewhere else
           </button>
           <Link to="/app/dashboard" className="em-action-btn log">
-            ✅ Urge passed — log today&apos;s check-in
+            Urge passed — log today's check-in
           </Link>
         </section>
       )}
@@ -124,7 +124,7 @@ export default function Emergency() {
           <h2>Box breath</h2>
           <p className="breathe-sub">Four cycles is enough to shift your body out of panic mode.</p>
           <div className={`breathe-ring ${breathRunning ? 'active' : ''}`}>
-            <span className="breathe-phase">{breathRunning ? phase.label : 'Ready?'}</span>
+            <span className="breathe-phase">{breathRunning ? phase.label : 'Ready'}</span>
             <span className="breathe-count">{breathRunning ? countdown : '—'}</span>
           </div>
           <p className="breathe-cycles">{cyclesDone > 0 ? `${cyclesDone} cycle${cyclesDone === 1 ? '' : 's'} complete` : ''}</p>
@@ -158,7 +158,7 @@ export default function Emergency() {
             Shame grows in silence. You only need one sentence: &ldquo;I am struggling — can you talk for five minutes?&rdquo;
           </p>
           <a href="sms:?body=Hey%2C%20having%20a%20hard%20moment.%20Can%20you%20check%20in%20with%20me%3F" className="em-action-btn sms">
-            💬 Draft a text to someone you trust
+            Draft a text to someone you trust
           </a>
           <div className="crisis-block">
             <p className="crisis-title">If you might hurt yourself</p>

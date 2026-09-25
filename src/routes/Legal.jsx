@@ -1,75 +1,77 @@
-import { Link } from 'react-router-dom';
-import { PageLayout } from '../components/Layout.jsx';
+import { useEffect } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import { PageLayout, Logo } from '../components/Layout.jsx';
 import { WHITEPAPER } from '../content/whitepaper.js';
 import './Legal.css';
 
 export default function Whitepaper() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [location.hash]);
+
   return (
-    <PageLayout className="legal-page">
-      <article className="legal-doc">
-        <Link to="/" className="legal-back">← Back</Link>
-        <h1>{WHITEPAPER.title}</h1>
+    <PageLayout className="wp-page" atmosphere="quiet">
+      <article className="wp-body">
+        <div className="wp-top">
+          <Logo />
+          <Link to="/landing" className="wp-back">Back</Link>
+        </div>
         {WHITEPAPER.sections.map((s) => (
-          <section key={s.heading}>
+          <section key={s.id} id={s.id} className="wp-section">
             <h2>{s.heading}</h2>
-            {s.paragraphs.map((p, i) => (
+            {s.paragraphs?.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
+            {s.tiers && (
+              <div className="tier-grid">
+                {s.tiers.map((tier) => (
+                  <div key={tier.name} className={`tier-card ${tier.name.includes('Supporter') ? 'tier-supporter' : 'tier-free'}`}>
+                    <h3>{tier.name}</h3>
+                    <div className="tier-price">{tier.price}</div>
+                    {tier.features.length > 0 && (
+                      <>
+                        <h4>Includes</h4>
+                        <ul>
+                          {tier.features.map((f) => <li key={f}>{f}</li>)}
+                        </ul>
+                      </>
+                    )}
+                    {tier.limitations.length > 0 && (
+                      <>
+                        <h4>Limitations</h4>
+                        <ul className="tier-limits">
+                          {tier.limitations.map((l) => <li key={l}>{l}</li>)}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         ))}
+        <div className="wp-footer-card">
+          <div className="wp-footer-logo">
+            <span className="wp-logo-re">Re</span>
+            <span className="wp-logo-claim">Claim</span>
+          </div>
+          <p>A M. Peters Group Initiative</p>
+          <p className="wp-footer-tag">Take back control of your sexuality</p>
+        </div>
       </article>
     </PageLayout>
   );
 }
 
 export function Privacy() {
-  return (
-    <PageLayout className="legal-page">
-      <article className="legal-doc">
-        <Link to="/" className="legal-back">← Home</Link>
-        <h1>Privacy Policy</h1>
-        <p>Last updated: May 2026</p>
-        <section>
-          <h2>What we collect</h2>
-          <p>Check-in data, streak statistics, and chat messages sent to Becca. Account holders: email and profile name stored in Firebase.</p>
-        </section>
-        <section>
-          <h2>Anonymous mode</h2>
-          <p>Data stays in your browser localStorage only. Clearing browser data removes it.</p>
-        </section>
-        <section>
-          <h2>Becca / AI</h2>
-          <p>Messages are processed via our secure server proxy to Anthropic. We do not sell your data.</p>
-        </section>
-        <section>
-          <h2>Your rights</h2>
-          <p>Export data from Settings. Account deletion: contact support or delete Firebase auth user in console.</p>
-        </section>
-      </article>
-    </PageLayout>
-  );
+  return <Navigate to="/learn#terms" replace />;
 }
 
 export function Terms() {
-  return (
-    <PageLayout className="legal-page">
-      <article className="legal-doc">
-        <Link to="/" className="legal-back">← Home</Link>
-        <h1>Terms of Use</h1>
-        <p>Last updated: May 2026</p>
-        <section>
-          <h2>Not medical advice</h2>
-          <p>ReClaim and Becca are recovery support tools, not licensed therapy or medical treatment.</p>
-        </section>
-        <section>
-          <h2>Crisis</h2>
-          <p>If you are in immediate danger, contact local emergency services. Use Emergency mode for urge support, not life-threatening crises.</p>
-        </section>
-        <section>
-          <h2>Acceptable use</h2>
-          <p>Do not abuse the chat API, attempt to extract system prompts, or use the service for non-recovery purposes.</p>
-        </section>
-      </article>
-    </PageLayout>
-  );
+  return <Navigate to="/learn#terms" replace />;
 }

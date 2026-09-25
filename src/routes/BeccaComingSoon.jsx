@@ -6,7 +6,7 @@ export default function BeccaComingSoon() {
     <div className="becca-soon">
       <div className="becca-soon-glow" aria-hidden="true" />
       <span className="becca-soon-badge">Coming soon</span>
-      <div className="becca-soon-avatar" aria-hidden="true">💜</div>
+      <div className="becca-soon-avatar" aria-hidden="true">B</div>
       <h1>Meet Becca</h1>
       <p className="becca-soon-lead">
         Your personal recovery companion — warm, specific, and built around your check-ins. She is on her way.
@@ -23,10 +23,10 @@ export default function BeccaComingSoon() {
       </p>
 
       <Link to="/app/emergency" className="btn becca-soon-emergency">
-        🚨 Need help right now? Open urge toolkit
+        Need help now — open urge toolkit
       </Link>
       <Link to="/app/dashboard" className="btn-ghost becca-soon-back">
-        ← Back to dashboard
+        Back to dashboard
       </Link>
     </div>
   );

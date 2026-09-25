@@ -2,7 +2,7 @@ import { getJourneyDay } from '../../lib/dates.js';
 import { getString, STORAGE_KEYS } from '../../lib/storage.js';
 
 export function buildSystemPrompt(stats, checkins) {
-  const journeyDay = getJourneyDay(stats.startDate ? new Date(stats.startDate) : undefined);
+  const journeyDay = getJourneyDay(stats.startDate);
   const keys = Object.keys(checkins).slice(-7);
   const recent = keys
     .map((k) => {
@@ -28,7 +28,7 @@ export function buildSystemPrompt(stats, checkins) {
 }
 
 export function buildAnalysisPrompt(stats, days) {
-  const journeyDay = getJourneyDay(stats.startDate ? new Date(stats.startDate) : undefined);
+  const journeyDay = getJourneyDay(stats.startDate);
   const isMultiple = days.length > 1;
 
   const sys = [

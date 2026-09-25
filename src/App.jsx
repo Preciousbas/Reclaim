@@ -3,6 +3,7 @@ import { UserProvider } from './hooks/useUser.jsx';
 import { AuthGuard } from './routes/AuthGuard.jsx';
 import Splash from './routes/Splash.jsx';
 import Landing from './routes/Landing.jsx';
+import Congrats from './routes/Congrats.jsx';
 import Auth, { NameSetup } from './routes/Auth.jsx';
 import AppShell from './routes/AppShell.jsx';
 import Dashboard from './routes/Dashboard.jsx';
@@ -20,11 +21,11 @@ export default function App() {
     <UserProvider>
       <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/landing" element={<Navigate to="/" replace />} />
-            <Route path="/splash" element={<Splash />} />
+            <Route path="/" element={<Splash />} />
+            <Route path="/landing" element={<Landing />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/signup/name" element={<NameSetup />} />
+            <Route path="/congrats" element={<Congrats />} />
             <Route path="/learn" element={<Whitepaper />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />

@@ -15,13 +15,13 @@
 }
 
 .phase-medal {
-  font-size: 48px;
+  display: none;
 }
 
 .phase-hero h1 {
   font-family: var(--font-display);
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .phase-hero p {
@@ -55,12 +55,79 @@
   list-style: none;
 }
 
+.ph-ic {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+
+.ph-inf {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ph-tt { font-size: 15px; }
+.ph-sb { font-size: 12px; color: rgba(255, 255, 255, 0.5); font-weight: 600; }
+
+.ph-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ph-body p {
+  margin-bottom: 12px;
+}
+
+.ph-closing {
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.sbdg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+.sb-ic { display: none; }
+.sb-nm { font-weight: 700; font-size: 14px; }
+.sb-ds { font-size: 12px; color: rgba(232, 228, 220, 0.5); }
+.sb-st {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(232, 228, 220, 0.4);
+}
+
+.phase-card summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
 .phase-card summary::-webkit-details-marker {
   display: none;
 }
 
 .ph-ar {
   margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 228, 220, 0.4);
 }
 
 .phase-card p {
@@ -69,6 +136,37 @@
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.8);
 }
+
+.ph-body p {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.medal-ladder {
+  margin-top: 8px;
+}
+
+.ladder-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: -4px 0 12px;
+}
+
+.ml-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: var(--glass);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.ml-ic { display: none; }
+.ml-nm { font-weight: 700; font-size: 14px; }
+.ml-rq { font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 2px; }
 
 .section-title {
   font-family: var(--font-display);
@@ -95,8 +193,8 @@
   opacity: 1;
 }
 
-.ms-row span:first-child {
-  font-size: 24px;
+.ms-row span.day-mark {
+  font-size: 13px;
 }
 
 .ms-row strong {

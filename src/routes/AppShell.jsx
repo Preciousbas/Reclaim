@@ -1,47 +1,82 @@
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useUserData } from '../hooks/useUser.jsx';
 import { isBeccaEnabled } from '../lib/features.js';
+import { getString, setItem, STORAGE_KEYS } from '../lib/storage.js';
 import { PageLayout, Logo } from '../components/Layout.jsx';
 import './AppShell.css';
+
+const NAV = [
+  { to: '/app/dashboard', label: 'Home', mark: 'H' },
+  { to: '/app/chat', label: 'Becca', mark: 'B', soon: true },
+  { to: '/app/phases', label: 'Phases', mark: 'P' },
+  { to: '/app/settings', label: 'Settings', mark: 'S' },
+];
 
 export default function AppShell() {
   const { stats } = useUserData();
   const navigate = useNavigate();
   const beccaLive = isBeccaEnabled();
+  const [collapsed, setCollapsed] = useState(
+    () => getString(STORAGE_KEYS.RAIL_COLLAPSED) === 'yes'
+  );
+
+  const toggleRail = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      setItem(STORAGE_KEYS.RAIL_COLLAPSED, next ? 'yes' : 'no');
+      return next;
+    });
+  };
 
   return (
-    <PageLayout>
-      <div className="app-shell">
-        <header className="app-header">
-          <Logo />
-          <span className="app-greeting">Hey, {stats.reclaimName || 'Champion'}</span>
-        </header>
+    <PageLayout atmosphere="quiet">
+      <div className={`app-shell${collapsed ? ' is-rail-collapsed' : ''}`}>
+        <aside className="app-rail">
+          <header className="app-header">
+            <Logo />
+            <span className="app-greeting">{stats.reclaimName || 'Welcome back'}</span>
+            <button
+              type="button"
+              className="rail-toggle"
+              aria-expanded={!collapsed}
+              aria-controls="app-nav"
+              aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+              onClick={toggleRail}
+            >
+              {collapsed ? '›' : '‹'}
+            </button>
+          </header>
+          <nav className="app-nav" id="app-nav" aria-label="Main">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                title={item.label}
+                className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+              >
+                <span className="nav-mark" aria-hidden="true">{item.mark}</span>
+                <span className="nav-label">{item.label}</span>
+                {item.soon && !beccaLive && <span className="nav-soon">Soon</span>}
+              </NavLink>
+            ))}
+          </nav>
+          <button
+            type="button"
+            className="emergency-btn"
+            aria-label="Urge toolkit — immediate help without chat"
+            title="Need help now"
+            onClick={() => navigate('/app/emergency')}
+          >
+            <span className="emergency-full">Need help now</span>
+            <span className="emergency-short">Help</span>
+          </button>
+        </aside>
         <main className="app-main">
-          <Outlet />
+          <div className="app-main-inner">
+            <Outlet />
+          </div>
         </main>
-        <nav className="app-nav" aria-label="Main">
-          <NavLink to="/app/dashboard" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
-            Home
-          </NavLink>
-          <NavLink to="/app/chat" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
-            Becca
-            {!beccaLive && <span className="nav-soon">Soon</span>}
-          </NavLink>
-          <NavLink to="/app/phases" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
-            Phases
-          </NavLink>
-          <NavLink to="/app/settings" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
-            Settings
-          </NavLink>
-        </nav>
-        <button
-          type="button"
-          className="emergency-btn"
-          aria-label="Urge toolkit — immediate help without chat"
-          onClick={() => navigate('/app/emergency')}
-        >
-          🚨 Urge hitting now?
-        </button>
       </div>
     </PageLayout>
   );

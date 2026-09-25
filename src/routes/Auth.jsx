@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, useUserData } from '../hooks/useUser.jsx';
 import { PageLayout, Logo } from '../components/Layout.jsx';
@@ -26,12 +26,18 @@ export default function Auth() {
   const [showAnon, setShowAnon] = useState(false);
 
   const navigate = useNavigate();
-  const { signUpEmail, signInEmail, signInGoogle, resetPassword } = useAuth();
-  const { setName } = useUserData();
+  const { signUpEmail, signInEmail, signInGoogle, resetPassword, authReady, isAuthenticated } = useAuth();
+  const { setName, stats, hasProfile } = useUserData();
 
   const goNext = () => {
     navigate('/app/dashboard');
   };
+
+  useEffect(() => {
+    if (!authReady) return;
+    if (isAuthenticated && hasProfile) navigate('/app/dashboard', { replace: true });
+    else if (isAuthenticated && !hasProfile) navigate('/signup/name', { replace: true });
+  }, [authReady, isAuthenticated, hasProfile, navigate]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -71,10 +77,25 @@ export default function Auth() {
     setError('');
     setLoading(true);
     try {
-      await signInGoogle();
-      goNext();
+      const result = await signInGoogle();
+      if (result === null) return;
+      const hasName = stats.reclaimName || result.displayName;
+      if (!hasName) {
+        navigate('/signup/name');
+      } else {
+        goNext();
+      }
     } catch (err) {
-      setError(err.message || 'Google sign-in failed.');
+      const code = err.code || '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('');
+      } else if (code === 'auth/popup-blocked') {
+        setError('Popup blocked. Allow popups for this site, then try Google again.');
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorized in Firebase. Add it in Firebase Console, Authentication, Settings, Authorized domains.');
+      } else {
+        setError(err.message || 'Google sign-in failed.');
+      }
     } finally {
       setLoading(false);
     }
@@ -119,11 +140,11 @@ export default function Auth() {
                   maxLength={24}
                 />
                 {error && <div className="error-banner">{error}</div>}
-                <button type="submit" className="btn-name-warm">Continue anonymously →</button>
+                <button type="submit" className="btn-name-warm">Continue anonymously</button>
               </form>
               <p className="anon-switch">
                 <button type="button" className="link-btn" onClick={() => setShowAnon(false)}>
-                  ← Back to sign up
+                  Back to sign up
                 </button>
               </p>
             </div>
@@ -163,7 +184,7 @@ export default function Auth() {
                   <input id="pw2" type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
                 </div>
                 {error && <div className="error-banner">{error}</div>}
-                <button type="submit" className="btn" disabled={loading}>{loading ? 'Creating…' : 'Create My Account →'}</button>
+                <button type="submit" className="btn" disabled={loading}>{loading ? 'Creating…' : 'Create account'}</button>
               </form>
             ) : (
               <form onSubmit={handleLogin}>
@@ -176,7 +197,7 @@ export default function Auth() {
                   <input id="pw3" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 {error && <div className="error-banner">{error}</div>}
-                <button type="submit" className="btn" disabled={loading}>{loading ? 'Logging in…' : 'Log In →'}</button>
+                <button type="submit" className="btn" disabled={loading}>{loading ? 'Logging in…' : 'Log in'}</button>
                 <button type="button" className="btn-ghost" onClick={handleReset}>Forgot password?</button>
               </form>
             )}
@@ -190,9 +211,7 @@ export default function Auth() {
             <p className="privacy-note">
               <button type="button" className="link-btn" onClick={() => setShowAnon(true)}>Continue anonymously</button>
               {' · '}
-              <Link to="/privacy">Privacy</Link>
-              {' · '}
-              <Link to="/terms">Terms</Link>
+              <Link to="/learn">Terms & Privacy</Link>
             </p>
           </div>
         </div>
@@ -224,7 +243,7 @@ export function NameSetup() {
             <form onSubmit={submit}>
               <input className="big-input" value={name} onChange={(e) => setNameLocal(e.target.value)} placeholder="Your name" maxLength={24} />
               {error && <div className="error-banner">{error}</div>}
-              <button type="submit" className="btn-name">Continue →</button>
+              <button type="submit" className="btn-name">Continue</button>
             </form>
           </div>
         </div>

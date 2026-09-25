@@ -18,13 +18,13 @@
 }
 
 .dash-medal {
-  font-size: 36px;
+  display: none;
 }
 
 .dash-title {
   font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .dash-level {
@@ -33,14 +33,22 @@
 }
 
 .ri-badge {
-  background: rgba(255, 255, 255, 0.06);
+  background: transparent;
   border: 1px solid var(--glass-border);
-  border-radius: 100px;
-  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
 }
+
+.ri-val { font-size: 14px; }
+.ri-lbl { font-size: 9px; letter-spacing: 1px; opacity: 0.6; }
+.ri-tap { font-size: 10px; opacity: 0.4; }
 
 .flame-row {
   text-align: center;
@@ -49,9 +57,9 @@
 
 .flame-num {
   font-family: var(--font-display);
-  font-size: 56px;
-  font-weight: 900;
-  color: var(--gold);
+  font-size: 64px;
+  font-weight: 500;
+  color: var(--white);
   display: block;
   line-height: 1;
 }
@@ -65,26 +73,31 @@
 
 .ci-btn {
   width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  padding: 14px;
+  background: var(--violet);
   border: none;
-  border-radius: 14px;
-  color: #1a0e3d;
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 800;
+  border-radius: var(--radius-md);
+  color: var(--deep);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 28px rgba(245, 197, 24, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.ci-btn:hover {
+  transform: scale(0.98);
 }
 
 .ci-done {
   text-align: center;
   padding: 14px;
-  background: rgba(110, 231, 183, 0.12);
-  border: 1px solid rgba(110, 231, 183, 0.3);
-  border-radius: 12px;
-  color: #6ee7b7;
-  font-weight: 700;
+  background: rgba(122, 158, 138, 0.12);
+  border: 1px solid rgba(122, 158, 138, 0.28);
+  border-radius: var(--radius-md);
+  color: var(--success);
+  font-weight: 400;
 }
 
 .checkin-toast {
@@ -96,14 +109,14 @@
 }
 
 .checkin-toast-saved {
-  background: rgba(110, 231, 183, 0.12);
-  border: 1px solid rgba(110, 231, 183, 0.35);
-  color: #6ee7b7;
+  background: rgba(122, 158, 138, 0.12);
+  border: 1px solid rgba(122, 158, 138, 0.35);
+  color: var(--success);
 }
 
 .checkin-toast-backfill {
-  background: rgba(163, 116, 255, 0.12);
-  border: 1px solid rgba(163, 116, 255, 0.35);
+  background: rgba(210, 180, 138, 0.1);
+  border: 1px solid rgba(210, 180, 138, 0.3);
   color: var(--accent);
 }
 
@@ -164,8 +177,8 @@
   display: block;
   font-family: var(--font-display);
   font-size: 28px;
-  font-weight: 800;
-  color: var(--gold);
+  font-weight: 500;
+  color: var(--white);
 }
 
 .stat-lbl {
@@ -203,11 +216,12 @@
 }
 
 .bar-fill.conf {
-  background: linear-gradient(90deg, var(--violet), var(--glow));
+  background: var(--gold);
 }
 
 .bar-fill.rew {
-  background: linear-gradient(90deg, var(--gold), var(--warm));
+  background: var(--gold);
+  opacity: 0.65;
 }
 
 .ms-list {
@@ -223,8 +237,16 @@
   padding: 12px;
   background: var(--glass);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  opacity: 0.5;
+  border-radius: var(--radius-md);
+  opacity: 0.45;
+}
+
+.ms-state {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 228, 220, 0.4);
 }
 
 .ms-it.done {
@@ -268,9 +290,9 @@
 }
 
 .cal-dy.win {
-  background: rgba(110, 231, 183, 0.2);
-  border-color: #6ee7b7;
-  color: #6ee7b7;
+  background: rgba(122, 158, 138, 0.2);
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .cal-dy.loss {
@@ -327,7 +349,7 @@
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.85);
   padding: 12px;
-  background: rgba(108, 63, 214, 0.12);
+  background: rgba(210, 180, 138, 0.1);
   border-radius: 10px;
 }
 
@@ -375,18 +397,23 @@
 }
 
 .milestone-card {
-  background: var(--deep);
-  border: 1px solid var(--gold);
-  border-radius: 20px;
+  background: var(--ink);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
   padding: 32px;
   text-align: center;
   max-width: 360px;
 }
 
 .ms-emoji {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 16px;
+  display: none;
+}
+
+.milestone-card .day-mark {
+  margin: 0 auto 16px;
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
 }
 
 .milestone-card h2 {
@@ -398,4 +425,94 @@
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.6;
   margin-bottom: 24px;
+}
+
+.contact-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(210, 180, 138, 0.55);
+}
+
+.contact-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.contact-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.contact-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.contact-mail-btn {
+  display: inline-block;
+  padding: 11px 24px;
+  background: var(--violet);
+  border-radius: var(--radius-md);
+  color: var(--deep);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+
+.contact-mail-btn:hover {
+  transform: scale(0.98);
+}
+
+.contact-email-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.contact-footer {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.8;
+}
+
+.contact-wp-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.contact-wp-link strong {
+  display: block;
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.contact-wp-link p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.contact-arrow {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 18px;
 }

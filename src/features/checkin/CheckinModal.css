@@ -16,8 +16,8 @@
   max-width: 520px;
   max-height: 92vh;
   overflow-y: auto;
-  background: #12072e;
-  border-radius: 24px 24px 0 0;
+  background: var(--ink);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   border: 1px solid var(--glass-border);
   padding: 24px 20px 32px;
 }
@@ -43,6 +43,45 @@
   line-height: 1;
 }
 
+.checkin-body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.checkin-why {
+  flex: 0 0 140px;
+  background: rgba(232, 228, 220, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.checkin-why-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.checkin-why p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(232, 228, 220, 0.65);
+  font-weight: 400;
+}
+
+.checkin-fields {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .checkin-body { flex-direction: column; }
+  .checkin-why { flex: none; width: 100%; }
+}
+
 .checkin-label {
   font-size: 12px;
   text-transform: uppercase;
@@ -63,8 +102,8 @@
   cursor: pointer;
 }
 
-.wl-btn.win.sel { border-color: var(--success); background: rgba(110, 231, 183, 0.15); }
-.wl-btn.loss.sel { border-color: var(--danger); background: rgba(239, 68, 68, 0.15); }
+.wl-btn.win.sel { border-color: var(--success); background: rgba(138, 154, 124, 0.18); }
+.wl-btn.loss.sel { border-color: var(--danger); background: rgba(184, 106, 88, 0.16); }
 
 .int-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -78,25 +117,39 @@
   cursor: pointer;
 }
 
-.int-btn.sel { background: var(--violet); border-color: var(--glow); color: #fff; }
+.int-btn.sel { background: var(--violet); border-color: var(--glow); color: var(--deep); }
 
 .mood-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .mo {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  height: auto;
+  width: auto;
+  border-radius: 100px;
   border: 1px solid var(--glass-border);
   background: transparent;
-  font-size: 22px;
+  font-size: 12px;
   cursor: pointer;
+  color: rgba(232, 228, 220, 0.75);
 }
 
-.mo.sel { border-color: var(--gold); background: rgba(245, 197, 24, 0.12); }
+.mo.sel { border-color: var(--gold); background: rgba(210, 180, 138, 0.12); }
 
 .checkin-save { margin-top: 20px; }
 
 textarea {
   resize: vertical;
   min-height: 64px;
+}
+
+@media (min-width: 960px) {
+  .checkin-overlay.open {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .checkin-sheet {
+    border-radius: var(--radius-xl);
+    max-height: 86vh;
+  }
 }

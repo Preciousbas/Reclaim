@@ -9,6 +9,8 @@ import {
   orderBy,
   limit,
   getDocs,
+  getCountFromServer,
+  startAfter,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase.js';
@@ -26,6 +28,7 @@ export async function saveUserData(uid, stats) {
     checkins: stats.checkins ?? {},
     quizAnswers: stats.quizAnswers ?? {},
     quizDone: stats.quizDone ?? '',
+    congratsShown: stats.congratsShown ?? false,
     lastUpdated: serverTimestamp(),
   };
   await setDoc(doc(db, 'users', uid), userData, { merge: true });
@@ -48,7 +51,7 @@ export async function getUniqueLbName(baseName) {
 }
 
 export async function joinLeaderboard(uid, stats) {
-  const baseName = stats.reclaimName || 'Champion';
+  const baseName = stats.reclaimName || 'Anonymous';
   const displayName = await getUniqueLbName(baseName);
   const ri = computeRIFromStats({
     streak: stats.streak,
@@ -84,12 +87,30 @@ export async function updateLeaderboardScore(uid, stats) {
   });
 }
 
-export async function fetchLeaderboard(limitCount = 50) {
-  const q = query(collection(db, 'leaderboard'), orderBy('ri', 'desc'), limit(limitCount));
+export async function fetchLeaderboard(limitCount = 50, afterDoc = null) {
+  let q = query(collection(db, 'leaderboard'), orderBy('ri', 'desc'), limit(limitCount));
+  if (afterDoc) {
+    q = query(collection(db, 'leaderboard'), orderBy('ri', 'desc'), startAfter(afterDoc), limit(limitCount));
+  }
   const snap = await getDocs(q);
-  return snap.docs.map((d, i) => ({
-    id: d.id,
-    rank: i + 1,
-    ...d.data(),
-  }));
+  return {
+    entries: snap.docs.map((d, i) => ({
+      id: d.id,
+      rank: i + 1,
+      ...d.data(),
+    })),
+    lastDoc: snap.docs[snap.docs.length - 1] || null,
+    hasMore: snap.docs.length === limitCount,
+  };
+}
+
+export async function fetchLeaderboardTotal() {
+  const snap = await getCountFromServer(collection(db, 'leaderboard'));
+  return snap.data().count;
+}
+
+export async function fetchUserRank(myRI) {
+  const q = query(collection(db, 'leaderboard'), where('ri', '>', myRI));
+  const snap = await getCountFromServer(q);
+  return snap.data().count + 1;
 }

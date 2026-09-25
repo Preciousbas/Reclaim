@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUserData } from '../../hooks/useUser.jsx';
-import { fetchLeaderboard } from '../../lib/firestore.js';
+import { fetchLeaderboard, fetchLeaderboardTotal, fetchUserRank } from '../../lib/firestore.js';
 import { computeRIFromStats, getRIColor } from '../../lib/resilience.js';
 import { getJourneyDay } from '../../lib/dates.js';
 import { calcRI } from '../../lib/resilience.js';
+import { RankDisc } from '../../components/Layout.jsx';
 import './Leaderboard.css';
 
 const DUMMY_NAMES = ['Alex', 'Jordan', 'Sam', 'Chris', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery'];
+const PAGE_SIZE = 50;
 
 function genDummies(count = 50) {
   if (import.meta.env.PROD) return [];
@@ -23,20 +25,25 @@ function genDummies(count = 50) {
   return out.sort((a, b) => b.ri - a.ri);
 }
 
-function lbBadge(days) {
-  if (days >= 365) return '💎';
-  if (days >= 270) return '🏆';
-  if (days >= 180) return '🥇';
-  if (days >= 90) return '🥈';
-  if (days >= 30) return '🥉';
-  return '🌱';
+function lbTone(days) {
+  if (days >= 365) return 'diamond';
+  if (days >= 270) return 'platinum';
+  if (days >= 180) return 'gold';
+  if (days >= 90) return 'silver';
+  if (days >= 30) return 'bronze';
+  return 'begin';
 }
 
 export default function LeaderboardPanel() {
   const { stats, joinLb, updateStats } = useUserData();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const journeyDay = getJourneyDay(stats.startDate ? new Date(stats.startDate) : undefined);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(null);
+  const [myRank, setMyRank] = useState(null);
+  const lastDocRef = useRef(null);
+  const journeyDay = getJourneyDay(stats.startDate);
   const joined = stats.lbJoined;
   const myRI = computeRIFromStats({
     streak: stats.streak,
@@ -45,44 +52,84 @@ export default function LeaderboardPanel() {
     checkins: stats.checkins,
   });
 
+  const loadBoard = async (append = false) => {
+    if (joined !== 'yes') return;
+    if (append) setLoadingMore(true);
+    else setLoading(true);
+    try {
+      const { entries: remote, lastDoc: ld, hasMore: more } = await fetchLeaderboard(
+        PAGE_SIZE,
+        append ? lastDocRef.current : null
+      );
+      lastDocRef.current = ld;
+      const mapped = remote.map((r, i) => ({
+        name: r.displayName,
+        days: r.streak,
+        ri: r.ri,
+        real: true,
+        uid: r.uid,
+        rank: append ? undefined : i + 1,
+      }));
+      setEntries((prev) => {
+        const next = append ? [...prev, ...mapped] : mapped;
+        return next.map((row, i) => ({ ...row, rank: row.rank || i + 1 }));
+      });
+      setHasMore(more);
+      if (!append) {
+        const total = await fetchLeaderboardTotal();
+        setTotalCount(total);
+        const rank = await fetchUserRank(myRI.ri);
+        setMyRank(rank);
+      }
+    } catch {
+      if (!append) setEntries(genDummies(30));
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      setLoading(true);
-      try {
-        if (joined === 'yes') {
-          const remote = await fetchLeaderboard(50);
-          if (!cancelled) setEntries(remote.map((r) => ({ name: r.displayName, days: r.streak, ri: r.ri, real: true, uid: r.uid })));
-        } else {
-          const dummies = genDummies(50);
-          if (!cancelled) setEntries(dummies);
-        }
-      } catch {
-        if (!cancelled) setEntries(genDummies(30));
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (joined === 'yes') {
+        await loadBoard(false);
+      } else {
+        setEntries(genDummies(50));
+        setLoading(false);
       }
+      if (cancelled) return;
     })();
     return () => { cancelled = true; };
-  }, [joined, stats.streak]);
+  }, [joined]);
 
-  const all = [...entries];
+  useEffect(() => {
+    if (joined === 'yes') loadBoard(false);
+  }, [stats.streak]);
+
+  const displayList = [...entries];
   if (joined === 'yes') {
-    const me = { name: stats.reclaimName, days: stats.streak, ri: myRI.ri, isMe: true, real: true };
-    if (!all.some((u) => u.isMe)) all.push(me);
-    else {
-      const idx = all.findIndex((u) => u.isMe);
-      if (idx >= 0) all[idx] = me;
+    const meInList = displayList.some((u) => u.uid && u.name === stats.reclaimName);
+    if (!meInList && myRank) {
+      displayList.push({
+        name: stats.reclaimName,
+        days: stats.streak,
+        ri: myRI.ri,
+        isMe: true,
+        real: true,
+        rank: myRank,
+      });
+    } else {
+      displayList.forEach((u, i) => {
+        if (u.name === stats.reclaimName) u.isMe = true;
+      });
     }
-    all.sort((a, b) => b.ri - a.ri);
   }
-
-  const myRank = all.findIndex((u) => u.isMe) + 1;
 
   if (journeyDay < 30 && joined !== 'yes') {
     return (
       <div className="lb-lock">
-        <p>🔒 Leaderboard unlocks at Day 30</p>
+        <p>Leaderboard unlocks at Day 30</p>
         <p className="lb-sub">Keep checking in — {30 - journeyDay} days to go.</p>
       </div>
     );
@@ -110,14 +157,14 @@ export default function LeaderboardPanel() {
       )}
       {loading ? <p>Loading…</p> : (
         <ul className="lb-list">
-          {all.slice(0, 50).map((u, i) => {
-            const rank = i + 1;
-            const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+          {displayList.slice(0, joined === 'yes' ? undefined : 50).map((u) => {
+            const rank = u.rank || displayList.indexOf(u) + 1;
             return (
               <li key={`${u.name}-${rank}`} className={`lb-row ${u.isMe ? 'me' : ''} ${rank <= 3 ? 'top3' : ''}`}>
-                <span className="lb-rank">{icon}</span>
+                <span className="lb-rank">#{rank}</span>
+                <RankDisc tone={lbTone(u.days)} />
                 <div className="lb-info">
-                  <div className="lb-name">{u.isMe ? '⭐ ' : ''}{lbBadge(u.days)} {u.name}</div>
+                  <div className="lb-name">{u.isMe ? 'You · ' : ''}{u.name}</div>
                   <div className="lb-meta" style={{ color: getRIColor(u.ri) }}>RI {(u.ri || 0).toFixed(4)} · {u.days}d clean</div>
                 </div>
               </li>
@@ -125,7 +172,14 @@ export default function LeaderboardPanel() {
           })}
         </ul>
       )}
-      <p className="lb-count">{all.length.toLocaleString()} people on this journey</p>
+      {hasMore && joined === 'yes' && (
+        <button type="button" className="btn-ghost lb-more" disabled={loadingMore} onClick={() => loadBoard(true)}>
+          {loadingMore ? 'Loading…' : 'Load more'}
+        </button>
+      )}
+      <p className="lb-count">
+        {(totalCount ?? displayList.length).toLocaleString()} people on this journey
+      </p>
     </div>
   );
 }

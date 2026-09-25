@@ -5,6 +5,12 @@
   min-height: 400px;
 }
 
+@media (min-width: 960px) {
+  .chat-page {
+    height: calc(100vh - 96px);
+  }
+}
+
 .chat-msgs {
   flex: 1;
   overflow-y: auto;
@@ -38,8 +44,8 @@
 }
 
 .msg.user .msg-bub {
-  background: linear-gradient(135deg, var(--violet), #8b5cf6);
-  color: #fff;
+  background: var(--violet);
+  color: var(--deep);
   border-bottom-right-radius: 4px;
 }
 
@@ -85,8 +91,8 @@
 
 .q-chip {
   padding: 8px 12px;
-  background: rgba(108, 63, 214, 0.2);
-  border: 1px solid rgba(163, 116, 255, 0.35);
+  background: rgba(210, 180, 138, 0.12);
+  border: 1px solid rgba(210, 180, 138, 0.3);
   border-radius: 100px;
   color: var(--accent);
   font-size: 12px;
@@ -111,13 +117,18 @@
 
 .chat-send {
   padding: 12px 18px;
-  background: linear-gradient(135deg, var(--violet), #8b5cf6);
+  background: var(--violet);
   border: none;
-  border-radius: 12px;
-  color: #fff;
+  border-radius: var(--radius-md);
+  color: var(--deep);
   font-weight: 700;
   cursor: pointer;
   flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.chat-send:hover:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .chat-send:disabled {

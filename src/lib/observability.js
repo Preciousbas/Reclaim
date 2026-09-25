@@ -26,7 +26,7 @@ export function useNotificationSchedule(enabled, time, name, streak) {
         delay,
         payload: {
           title: 'ReClaim — Check In Now',
-          body: `${name || 'Champion'}, your ${streak}-day streak is waiting.`,
+          body: name ? `${name}, your ${streak}-day streak is waiting.` : `Your ${streak}-day streak is waiting.`,
           icon: '/icons/icon.svg',
           badge: '/icons/icon.svg',
         },

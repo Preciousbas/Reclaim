@@ -4,13 +4,18 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
-  updateEmail,
+  verifyBeforeUpdateEmail,
   updatePassword,
+  updateProfile,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  setPersistence,
+  browserLocalPersistence,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase.js';
 import {
@@ -19,61 +24,118 @@ import {
   clearSessionStorage,
   STORAGE_KEYS,
   setItem,
-  setJSON,
 } from '../lib/storage.js';
 import { loadUserData, saveUserData, joinLeaderboard, updateLeaderboardScore } from '../lib/firestore.js';
-import { getStartDate } from '../lib/dates.js';
+import { repairStaleJourney, todayISO, withJourneyStart } from '../lib/dates.js';
 
 const UserContext = createContext(null);
+
+function googleProvider() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  return provider;
+}
+
+function mergeRemote(remote, local) {
+  if (!remote) return repairStaleJourney(local);
+  return repairStaleJourney({
+    streak: remote.streak ?? local.streak ?? 0,
+    wins: remote.wins ?? local.wins ?? 0,
+    losses: remote.losses ?? local.losses ?? 0,
+    best: remote.best ?? local.best ?? 0,
+    daysIn: remote.daysIn ?? local.daysIn ?? 1,
+    reclaimName: remote.reclaimName || local.reclaimName || '',
+    startDate: remote.startDate || local.startDate || '',
+    checkins: remote.checkins ?? local.checkins ?? {},
+    quizAnswers: remote.quizAnswers ?? local.quizAnswers ?? {},
+    quizDone: remote.quizDone ?? local.quizDone ?? '',
+    lbJoined: local.lbJoined,
+    notifEnabled: local.notifEnabled,
+    notifTime: local.notifTime,
+    congratsShown: remote.congratsShown ?? local.congratsShown ?? false,
+  });
+}
+
+async function hydrateGoogleUser(fbUser, persistLocal, currentStats) {
+  const remote = await loadUserData(fbUser.uid);
+  if (remote?.reclaimName) {
+    persistLocal(mergeRemote(remote, loadUserStats()));
+    return fbUser;
+  }
+  const first = fbUser.displayName?.split(' ')[0];
+  if (first && !currentStats.reclaimName) {
+    const next = withJourneyStart({
+      ...currentStats,
+      reclaimName: first,
+      startDate: Object.keys(currentStats.checkins || {}).length
+        ? (currentStats.startDate || todayISO())
+        : todayISO(),
+    });
+    persistLocal(next);
+    await saveUserData(fbUser.uid, next);
+  }
+  return fbUser;
+}
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
-  const [stats, setStats] = useState(() => loadUserStats());
+  const [stats, setStats] = useState(() => {
+    const loaded = loadUserStats();
+    const repaired = repairStaleJourney(loaded);
+    if (repaired !== loaded) saveUserStats(repaired);
+    return repaired;
+  });
   const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    getStartDate();
+    setPersistence(auth, browserLocalPersistence).catch(() => {});
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setUser(fbUser);
       if (fbUser) {
         setItem(STORAGE_KEYS.FB_UID, fbUser.uid);
         try {
           const remote = await loadUserData(fbUser.uid);
-          if (remote) {
-            const merged = {
-              streak: remote.streak ?? 0,
-              wins: remote.wins ?? 0,
-              losses: remote.losses ?? 0,
-              best: remote.best ?? 0,
-              daysIn: remote.daysIn ?? 1,
-              reclaimName: remote.reclaimName ?? '',
-              startDate: remote.startDate ?? stats.startDate,
-              checkins: remote.checkins ?? {},
-              quizAnswers: remote.quizAnswers ?? {},
-              quizDone: remote.quizDone ?? '',
-              lbJoined: stats.lbJoined,
-              notifEnabled: stats.notifEnabled,
-              notifTime: stats.notifTime,
-            };
+          if (remote && !cancelled) {
+            const merged = mergeRemote(remote, loadUserStats());
             saveUserStats(merged);
             setStats(merged);
+            if (merged.startDate !== remote.startDate || merged.checkins !== remote.checkins) {
+              saveUserData(fbUser.uid, merged).catch(() => {});
+            }
           }
         } catch (e) {
           console.warn('Failed to load remote user data', e);
         }
       }
-      setAuthReady(true);
+      if (!cancelled) setAuthReady(true);
     });
-    return unsub;
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (!result?.user) return;
+        const local = loadUserStats();
+        await hydrateGoogleUser(result.user, (next) => {
+          saveUserStats(next);
+          setStats(next);
+        }, local);
+      })
+      .catch((e) => console.warn('Google redirect result', e));
+
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   const persistLocal = useCallback((next) => {
-    saveUserStats(next);
-    setStats(next);
+    const repaired = repairStaleJourney(next);
+    saveUserStats(repaired);
+    setStats(repaired);
   }, []);
 
   const syncToFirestore = useCallback(
@@ -113,7 +175,7 @@ export function UserProvider({ children }) {
 
   const signUpEmail = useCallback(async ({ name, email, password }) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const next = { ...stats, reclaimName: name };
+    const next = withJourneyStart({ ...stats, reclaimName: name, startDate: todayISO() });
     persistLocal(next);
     await saveUserData(cred.user.uid, next);
     return cred.user;
@@ -122,43 +184,30 @@ export function UserProvider({ children }) {
   const signInEmail = useCallback(async ({ email, password }) => {
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const remote = await loadUserData(cred.user.uid);
-    if (remote) {
-      const merged = {
-        streak: remote.streak ?? 0,
-        wins: remote.wins ?? 0,
-        losses: remote.losses ?? 0,
-        best: remote.best ?? 0,
-        daysIn: remote.daysIn ?? 1,
-        reclaimName: remote.reclaimName ?? '',
-        startDate: remote.startDate ?? stats.startDate,
-        checkins: remote.checkins ?? {},
-        quizAnswers: remote.quizAnswers ?? {},
-        quizDone: remote.quizDone ?? '',
-        lbJoined: stats.lbJoined,
-        notifEnabled: stats.notifEnabled,
-        notifTime: stats.notifTime,
-      };
-      persistLocal(merged);
-    }
+    persistLocal(mergeRemote(remote, stats));
     return cred.user;
   }, [stats, persistLocal]);
 
   const signInGoogle = useCallback(async () => {
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-    const remote = await loadUserData(cred.user.uid);
-    if (remote?.reclaimName) {
-      persistLocal({
-        ...loadUserStats(),
-        ...remote,
-        reclaimName: remote.reclaimName,
-        checkins: remote.checkins ?? {},
-      });
-    } else if (cred.user.displayName && !stats.reclaimName) {
-      persistLocal({ ...stats, reclaimName: cred.user.displayName.split(' ')[0] });
-      await saveUserData(cred.user.uid, { ...stats, reclaimName: cred.user.displayName.split(' ')[0] });
+    const provider = googleProvider();
+    try {
+      const cred = await signInWithPopup(auth, provider);
+      await hydrateGoogleUser(cred.user, persistLocal, stats);
+      return cred.user;
+    } catch (err) {
+      const code = err.code || '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        throw err;
+      }
+      const needsRedirect = code === 'auth/popup-blocked'
+        || code === 'auth/operation-not-supported-in-this-environment';
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (needsRedirect || isMobile) {
+        await signInWithRedirect(auth, provider);
+        return null;
+      }
+      throw err;
     }
-    return cred.user;
   }, [stats, persistLocal]);
 
   const logout = useCallback(async () => {
@@ -173,14 +222,22 @@ export function UserProvider({ children }) {
 
   const setName = useCallback(
     (name, isAnon = false) => {
-      const next = {
+      const next = withJourneyStart({
         ...stats,
         reclaimName: name,
         reclaimIsAnon: isAnon,
-      };
+        startDate: stats.startDate && Object.keys(stats.checkins || {}).length
+          ? stats.startDate
+          : todayISO(),
+      });
       if (isAnon) setItem(STORAGE_KEYS.RECLAIM_ANON, 'yes');
       persistLocal(next);
-      if (user) saveUserData(user.uid, next).catch(() => {});
+      if (user) {
+        saveUserData(user.uid, next).catch(() => {});
+        if (user.providerData?.some((p) => p.providerId === 'password') || user.email) {
+          updateProfile(user, { displayName: name }).catch(() => {});
+        }
+      }
     },
     [stats, user, persistLocal]
   );
@@ -217,9 +274,10 @@ export function UserProvider({ children }) {
       exportData,
       changeEmail: async (newEmail, password) => {
         const u = auth.currentUser;
+        if (!u?.email) throw new Error('Not signed in.');
         const cred = EmailAuthProvider.credential(u.email, password);
         await reauthenticateWithCredential(u, cred);
-        await updateEmail(u, newEmail);
+        await verifyBeforeUpdateEmail(u, newEmail);
       },
       changePassword: async (currentPassword, newPassword) => {
         const u = auth.currentUser;

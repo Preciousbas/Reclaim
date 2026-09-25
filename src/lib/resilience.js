@@ -23,7 +23,6 @@ export function calcRI(days, totalCheckins, wins, losses, comebacks) {
 }
 
 export function getRILabel(ri) {
-  if (ri >= 1.0) return '🌟 Unbreakable';
   if (ri >= 0.9) return 'Unbreakable';
   if (ri >= 0.75) return 'Forged';
   if (ri >= 0.6) return 'Rising';
@@ -34,12 +33,12 @@ export function getRILabel(ri) {
 }
 
 export function getRIColor(ri) {
-  if (ri >= 0.9) return '#f5c518';
-  if (ri >= 0.75) return '#a374ff';
-  if (ri >= 0.6) return '#6ee7b7';
-  if (ri >= 0.45) return '#60a5fa';
-  if (ri >= 0.3) return '#f9a8d4';
-  return 'rgba(255,255,255,0.5)';
+  if (ri >= 0.9) return '#d2b48a';
+  if (ri >= 0.75) return '#c4a882';
+  if (ri >= 0.6) return '#8a9a7c';
+  if (ri >= 0.45) return '#b8956a';
+  if (ri >= 0.3) return '#c17f5c';
+  return 'rgba(239,232,220,0.5)';
 }
 
 export function countComebacks(checkins) {
@@ -100,9 +99,9 @@ export function computePatternInsights(checkins, stats, journeyDay) {
   let trend = 'Not enough data';
   if (last7w + last7l >= 3) {
     const r7 = last7w / (last7w + last7l);
-    if (r7 >= 0.7) trend = '📈 Strong';
-    else if (r7 >= 0.5) trend = '➡️ Steady';
-    else trend = '📉 Needs focus';
+    if (r7 >= 0.7) trend = 'Strong';
+    else if (r7 >= 0.5) trend = 'Steady';
+    else trend = 'Needs focus';
   }
 
   let message = '';
@@ -113,7 +112,7 @@ export function computePatternInsights(checkins, stats, journeyDay) {
 
   return {
     winRate: total > 0 ? `${wr}%` : 'No data yet',
-    streak: streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} 🔥` : '0 days',
+    streak: streak > 0 ? `${streak} day${streak === 1 ? '' : 's'}` : '0 days',
     best: best > 0 ? `${best} day${best === 1 ? '' : 's'}` : '0 days',
     lastLoss,
     last7: `${last7w}W / ${last7l}L`,

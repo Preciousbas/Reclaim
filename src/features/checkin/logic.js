@@ -1,4 +1,14 @@
-import { dayKey, journeyDayToDate, getJourneyDay } from '../../lib/dates.js';
+import { dayKey, journeyDayToDate, getJourneyDay, todayISO, formatLocalISO, parseStartDate } from '../../lib/dates.js';
+
+function resolveStartISO(startDate, stats) {
+  if (stats?.startDate) {
+    const s = String(stats.startDate);
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    return formatLocalISO(parseStartDate(s));
+  }
+  if (startDate) return formatLocalISO(parseStartDate(startDate));
+  return todayISO();
+}
 
 export function validateCheckinForm({ result, intensity, mood, trigger, action }) {
   return Boolean(
@@ -51,8 +61,10 @@ export function submitCheckin({
   action,
   worked,
   startDate,
-  today = getJourneyDay(startDate),
+  today,
 }) {
+  const resolvedStart = resolveStartISO(startDate, stats);
+  const resolvedToday = today ?? getJourneyDay(resolvedStart);
   const key = dayKey(day);
   if (checkins[key]) {
     return { error: `You already checked in for Day ${day}.` };
@@ -66,12 +78,12 @@ export function submitCheckin({
     trigger,
     action,
     worked,
-    startDate,
+    startDate: resolvedStart,
   });
 
   const nextCheckins = { ...checkins, [key]: ciData };
-  const isToday = day === today;
-  let nextStats = { ...stats };
+  const isToday = day === resolvedToday;
+  let nextStats = { ...stats, startDate: resolvedStart };
 
   if (isToday) {
     nextStats = applyTodayStats(nextStats, result);
@@ -88,13 +100,13 @@ export function submitCheckin({
 
 export function getBadge(stats) {
   const { streak, wins } = stats;
-  if (streak >= 365) return { icon: '💎', name: 'Spiritual Leader', level: 'Phase 3 · Diamond Medal', next: '' };
-  if (streak >= 270) return { icon: '🏆', name: 'The Guardian', level: 'Phase 3 · Platinum Medal', next: `${365 - streak} days to Spiritual Leader` };
-  if (streak >= 180) return { icon: '🥇', name: 'The Champion', level: 'Phase 3 · Gold Medal', next: `${270 - streak} days to The Guardian` };
-  if (streak >= 90) return { icon: '🥈', name: 'The Master', level: 'Phase 3 · Silver Medal', next: `${180 - streak} days to The Champion` };
-  if (wins >= 30) return { icon: '⚗️', name: 'The Overcomer', level: 'Phase 2 · Mercury Medal', next: `${90 - streak} days clean to The Master` };
-  if (wins >= 20) return { icon: '🥉', name: 'The Seeker', level: 'Phase 1 · Bronze Medal', next: 'Phase 2 started' };
-  return { icon: '🌱', name: 'The Next Big Thing', level: 'Beginner', next: `${30 - wins} check-ins to complete Phase 1` };
+  if (streak >= 365) return { tone: 'diamond', name: 'Spiritual Leader', level: 'Phase 3 · Diamond Medal', next: '' };
+  if (streak >= 270) return { tone: 'platinum', name: 'The Guardian', level: 'Phase 3 · Platinum Medal', next: `${365 - streak} days to Spiritual Leader` };
+  if (streak >= 180) return { tone: 'gold', name: 'The Champion', level: 'Phase 3 · Gold Medal', next: `${270 - streak} days to The Guardian` };
+  if (streak >= 90) return { tone: 'silver', name: 'The Master', level: 'Phase 3 · Silver Medal', next: `${180 - streak} days to The Champion` };
+  if (wins >= 30) return { tone: 'mercury', name: 'The Overcomer', level: 'Phase 2 · Mercury Medal', next: `${90 - streak} days clean to The Master` };
+  if (wins >= 20) return { tone: 'bronze', name: 'The Seeker', level: 'Phase 1 · Bronze Medal', next: 'Phase 2 started' };
+  return { tone: 'begin', name: 'The Next Big Thing', level: 'Beginner', next: `${30 - wins} check-ins to complete Phase 1` };
 }
 
 export function computeConfidence(stats, journeyDay) {

@@ -2,25 +2,21 @@
 
 .splash .tagline {
   font-family: var(--font-display);
-  font-size: clamp(13px, 3vw, 18px);
-  font-weight: 700;
-  letter-spacing: 5px;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 50%, var(--accent) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: rgba(232, 228, 220, 0.72);
 }
 
 .splash .logo-wrap {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translateY(0);
 }
 
 .splash .enter-wrap {
   position: fixed;
-  bottom: 52px;
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -33,27 +29,33 @@
   background: none;
   border: none;
   color: inherit;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.splash .enter-wrap:hover {
+  transform: translateX(-50%) scale(0.98);
+  opacity: 0.85;
 }
 
 .splash .enter-label {
-  font-size: 13px;
-  letter-spacing: 4px;
+  font-size: 12px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: var(--font-display);
+  color: rgba(232, 228, 220, 0.7);
+  font-family: var(--font-body);
 }
 
 .splash .chevron {
-  width: 18px;
-  height: 18px;
-  border-right: 2px solid rgba(200, 168, 255, 0.4);
-  border-bottom: 2px solid rgba(200, 168, 255, 0.4);
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid rgba(201, 168, 108, 0.55);
+  border-bottom: 1px solid rgba(201, 168, 108, 0.55);
   transform: rotate(45deg);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .splash .tagline {
-    animation: tagUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both, shimmer 3s linear 1.8s infinite;
+    animation: tagUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
   }
 
   .splash .logo-wrap {
@@ -63,14 +65,8 @@
   .splash .enter-wrap {
     animation: fadeIn 1s ease 1.2s both;
   }
-
-  .splash .chevron {
-    animation: bounce 1.6s ease-in-out infinite;
-  }
 }
 
-@keyframes tagUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes logoIn { from { opacity: 0; transform: scale(0.6) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes tagUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes logoIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes shimmer { to { background-position: 200% center; } }
-@keyframes bounce { 0%, 100% { transform: rotate(45deg) translateY(0); } 50% { transform: rotate(45deg) translateY(7px); } }

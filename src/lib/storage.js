@@ -17,6 +17,8 @@ export const STORAGE_KEYS = {
   NOTIF_ENABLED: 'notif-enabled',
   NOTIF_TIME: 'notif-time',
   RI_MAXED: 'ri-maxed',
+  CONGRATS_SHOWN: 'congratsShown',
+  RAIL_COLLAPSED: 'rail-collapsed',
 };
 
 /** Keys cleared on logout for a consistent session reset */
@@ -39,6 +41,7 @@ export const SESSION_KEYS = [
   STORAGE_KEYS.NOTIF_ENABLED,
   STORAGE_KEYS.NOTIF_TIME,
   STORAGE_KEYS.RI_MAXED,
+  STORAGE_KEYS.CONGRATS_SHOWN,
 ];
 
 export function getInt(key, fallback = 0) {
@@ -95,6 +98,7 @@ export function loadUserStats() {
     lbJoined: getString(STORAGE_KEYS.LB_JOINED),
     notifEnabled: getString(STORAGE_KEYS.NOTIF_ENABLED) === 'yes',
     notifTime: getString(STORAGE_KEYS.NOTIF_TIME, '20:00'),
+    congratsShown: getString(STORAGE_KEYS.CONGRATS_SHOWN) === 'yes',
   };
 }
 
@@ -114,4 +118,7 @@ export function saveUserStats(stats) {
     setItem(STORAGE_KEYS.NOTIF_ENABLED, stats.notifEnabled ? 'yes' : 'no');
   }
   if (stats.notifTime !== undefined) setItem(STORAGE_KEYS.NOTIF_TIME, stats.notifTime);
+  if (stats.congratsShown !== undefined) {
+    setItem(STORAGE_KEYS.CONGRATS_SHOWN, stats.congratsShown ? 'yes' : 'no');
+  }
 }
