@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { json } from './paystack.js';
+import { json } from '../lib/paystack.js';
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') {

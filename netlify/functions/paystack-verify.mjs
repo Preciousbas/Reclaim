@@ -1,4 +1,4 @@
-import { json, paystack } from './paystack.js';
+import { json, paystack } from '../lib/paystack.js';
 
 export async function handler(event) {
   if (event.httpMethod !== 'GET') {

@@ -1,4 +1,4 @@
-import { ensurePlan, isEmail, json, paystack, readJson, resolveCharge, siteOrigin, CURRENCY } from './paystack.js';
+import { ensurePlan, isEmail, json, paystack, readJson, resolveCharge, siteOrigin, CURRENCY } from '../lib/paystack.js';
 
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 10;
