@@ -1,21 +1,19 @@
-import { DONATION_DOLLARS, PRICES, koboFromDollars } from '../../src/lib/pricing.js';
+import { PRICES, centsFromDollars } from '../../src/lib/pricing.js';
 
-export const CURRENCY = 'NGN';
+export const CURRENCY = 'USD';
 
 export const PLANS = {
   monthly: {
     name: PRICES.monthly.name,
     interval: PRICES.monthly.interval,
-    amount: koboFromDollars(PRICES.monthly.dollars),
+    amount: centsFromDollars(PRICES.monthly.dollars),
   },
   yearly: {
     name: PRICES.yearly.name,
     interval: PRICES.yearly.interval,
-    amount: koboFromDollars(PRICES.yearly.dollars),
+    amount: centsFromDollars(PRICES.yearly.dollars),
   },
 };
-
-const DONATION_AMOUNTS = new Set(DONATION_DOLLARS);
 
 export function json(statusCode, body) {
   return {
@@ -63,18 +61,9 @@ export function siteOrigin(event) {
   return `${proto}://${host}`;
 }
 
-export function resolveCharge(kind, donationDollars) {
+export function resolveCharge(kind) {
   if (kind === 'monthly' || kind === 'yearly') {
     return { kind, amount: PLANS[kind].amount, plan: PLANS[kind] };
-  }
-  if (kind === 'donation') {
-    const dollars = Number(donationDollars);
-    if (!DONATION_AMOUNTS.has(dollars)) {
-      const err = new Error('Choose $5, $10, or $25.');
-      err.statusCode = 400;
-      throw err;
-    }
-    return { kind, amount: koboFromDollars(dollars), plan: null };
   }
   const err = new Error('Unknown checkout.');
   err.statusCode = 400;

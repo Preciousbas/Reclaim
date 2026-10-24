@@ -1,25 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { WHITEPAPER } from '../content/whitepaper.js';
 import { useAuth } from '../hooks/useUser.jsx';
 import { startCheckout, verifyPayment } from '../lib/paystack.js';
-import { NAIRA_PER_USD, formatNaira, nairaFromDollars } from '../lib/pricing.js';
 import './Payment.css';
 
 const PAYMENTS_ENABLED = import.meta.env.VITE_PAYMENTS_ENABLED === 'true';
 const tiers = WHITEPAPER.sections.find((s) => s.id === 'membership')?.tiers || [];
-const DONATIONS = [5, 10, 25];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Payment() {
   const { user } = useAuth();
   const [params] = useSearchParams();
-  const [email, setEmail] = useState(user?.email || '');
+  const accountEmail = user?.email?.trim() || '';
+  const emailRef = useRef(null);
+  const [email, setEmail] = useState('');
   const [busy, setBusy] = useState('');
   const [notice, setNotice] = useState(null);
-
-  useEffect(() => {
-    if (user?.email) setEmail(user.email);
-  }, [user?.email]);
 
   useEffect(() => {
     const reference = params.get('reference') || params.get('trxref');
@@ -38,20 +35,21 @@ export default function Payment() {
     return () => { cancelled = true; };
   }, [params]);
 
-  async function checkout(kind, amount) {
+  async function checkout(kind) {
     if (!PAYMENTS_ENABLED) {
       setNotice({ tone: 'err', text: 'Payments are not enabled yet.' });
       return;
     }
-    const receiptEmail = email.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(receiptEmail)) {
+    const receiptEmail = accountEmail || email.trim();
+    if (!EMAIL_PATTERN.test(receiptEmail)) {
       setNotice({ tone: 'err', text: 'Enter an email so Paystack can send the receipt.' });
+      emailRef.current?.focus();
       return;
     }
-    setBusy(kind === 'donation' ? `donation-${amount}` : kind);
+    setBusy(kind);
     setNotice(null);
     try {
-      await startCheckout({ kind, amount, email: receiptEmail });
+      await startCheckout({ kind, email: receiptEmail });
     } catch (err) {
       setNotice({ tone: 'err', text: err.message });
       setBusy('');
@@ -64,10 +62,6 @@ export default function Payment() {
       <p className="payment-sub">
         Core recovery tools are always free. Supporter membership keeps ReClaim running and unlocks the full Becca experience.
       </p>
-
-      {notice && (
-        <p className={`pay-status pay-status-${notice.tone}`} role="status">{notice.text}</p>
-      )}
 
       <div className="tier-grid">
         {tiers.map((tier) => (
@@ -92,57 +86,45 @@ export default function Payment() {
             )}
             {tier.name.includes('Supporter') && (
               <div className="plan-actions">
-                <p className="plan-note">
-                  Yearly is the monthly rate for ten months. Checkout is in naira at {formatNaira(NAIRA_PER_USD)} per dollar.
-                </p>
+                {notice && (
+                  <p className={`pay-status pay-status-${notice.tone}`} role="status">{notice.text}</p>
+                )}
+                {!accountEmail && (
+                  <div className="pay-email">
+                    <label htmlFor="pay-email">Receipt email</label>
+                    <input
+                      ref={emailRef}
+                      id="pay-email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      aria-invalid={notice?.tone === 'err' && !email.trim()}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@email.com"
+                    />
+                  </div>
+                )}
+                <p className="plan-note">Yearly is the monthly rate for ten months.</p>
+                <button
+                  type="button"
+                  className="btn tier-cta"
+                  disabled={Boolean(busy)}
+                  onClick={() => checkout('monthly')}
+                >
+                  {busy === 'monthly' ? 'Opening Paystack…' : 'Pay $7 / month'}
+                </button>
                 <button
                   type="button"
                   className="btn tier-cta"
                   disabled={Boolean(busy)}
                   onClick={() => checkout('yearly')}
                 >
-                  {busy === 'yearly' ? 'Opening Paystack…' : `Pay ${formatNaira(nairaFromDollars(70))} / year`}
-                </button>
-                <button
-                  type="button"
-                  className="btn-ghost"
-                  disabled={Boolean(busy)}
-                  onClick={() => checkout('monthly')}
-                >
-                  {busy === 'monthly' ? 'Opening Paystack…' : `Pay ${formatNaira(nairaFromDollars(7))} / month`}
+                  {busy === 'yearly' ? 'Opening Paystack…' : 'Pay $70 / year'}
                 </button>
               </div>
             )}
           </div>
-        ))}
-      </div>
-
-      <label htmlFor="pay-email">Receipt email</label>
-      <input
-        id="pay-email"
-        type="email"
-        autoComplete="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@email.com"
-      />
-
-      <h2 className="donate-title">Voluntary donation</h2>
-      <p className="payment-sub">
-        Every amount keeps ReClaim available for someone who needs it. Charged in naira at {formatNaira(NAIRA_PER_USD)} per dollar.
-      </p>
-
-      <div className="amount-grid">
-        {DONATIONS.map((amt) => (
-          <button
-            key={amt}
-            type="button"
-            className="amount-opt"
-            disabled={Boolean(busy)}
-            onClick={() => checkout('donation', amt)}
-          >
-            {busy === `donation-${amt}` ? '…' : `$${amt}`}
-          </button>
         ))}
       </div>
 

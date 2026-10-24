@@ -37,7 +37,7 @@ export async function handler(event) {
       return json(400, { error: 'Enter an email so Paystack can send the receipt.' });
     }
 
-    const charge = resolveCharge(body.kind, body.amount);
+    const charge = resolveCharge(body.kind);
     const origin = siteOrigin(event);
     if (!origin) {
       return json(400, { error: 'Missing site origin.' });
@@ -60,6 +60,9 @@ export async function handler(event) {
       reference: started.data.reference,
     });
   } catch (err) {
-    return json(err.statusCode || 500, { error: err.message || 'Could not start checkout' });
+    const message = /currency/i.test(err.message || '')
+      ? 'Paystack is not accepting US dollars on this account yet. Enable USD in the Paystack dashboard, then try again.'
+      : (err.message || 'Could not start checkout');
+    return json(err.statusCode || 500, { error: message });
   }
 }

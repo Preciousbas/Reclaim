@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useUserData } from '../hooks/useUser.jsx';
 import { isBeccaEnabled } from '../lib/features.js';
 import { getString, setItem, STORAGE_KEYS } from '../lib/storage.js';
@@ -11,11 +11,14 @@ const NAV = [
   { to: '/app/chat', label: 'Becca', mark: 'B', soon: true },
   { to: '/app/phases', label: 'Phases', mark: 'P' },
   { to: '/app/settings', label: 'Settings', mark: 'S' },
+  { to: '/app/payment', label: 'Subscribe', mark: '+' },
 ];
 
 export default function AppShell() {
   const { stats } = useUserData();
   const navigate = useNavigate();
+  const location = useLocation();
+  const onPayment = location.pathname === '/app/payment';
   const beccaLive = isBeccaEnabled();
   const [collapsed, setCollapsed] = useState(
     () => getString(STORAGE_KEYS.RAIL_COLLAPSED) === 'yes'
@@ -36,6 +39,9 @@ export default function AppShell() {
           <header className="app-header">
             <Logo />
             <span className="app-greeting">{stats.reclaimName || 'Welcome back'}</span>
+            {!onPayment && (
+              <Link to="/app/payment" className="subscribe-link subscribe-in-bar">Subscribe</Link>
+            )}
             <button
               type="button"
               className="rail-toggle"
@@ -53,7 +59,7 @@ export default function AppShell() {
                 key={item.to}
                 to={item.to}
                 title={item.label}
-                className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}${item.to === '/app/payment' ? ' nav-subscribe' : ''}`}
               >
                 <span className="nav-mark" aria-hidden="true">{item.mark}</span>
                 <span className="nav-label">{item.label}</span>
@@ -74,6 +80,11 @@ export default function AppShell() {
         </aside>
         <main className="app-main">
           <div className="app-main-inner">
+            {!onPayment && (
+              <div className="subscribe-row">
+                <Link to="/app/payment" className="subscribe-link subscribe-in-canvas">Subscribe</Link>
+              </div>
+            )}
             <Outlet />
           </div>
         </main>
