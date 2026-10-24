@@ -1,3 +1,5 @@
+export const NAIRA_PER_USD = 1327;
+
 export const PRICES = {
   monthly: {
     dollars: 7,
@@ -11,6 +13,6 @@ export const PRICES = {
   },
 };
 
-export function centsFromDollars(dollars) {
-  return Math.round(dollars * 100);
+export function koboFromDollars(dollars) {
+  return Math.round(dollars * NAIRA_PER_USD) * 100;
 }

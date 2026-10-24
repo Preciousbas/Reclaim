@@ -1,17 +1,17 @@
-import { PRICES, centsFromDollars } from '../../src/lib/pricing.js';
+import { PRICES, koboFromDollars } from '../../src/lib/pricing.js';
 
-export const CURRENCY = 'USD';
+export const CURRENCY = 'NGN';
 
 export const PLANS = {
   monthly: {
     name: PRICES.monthly.name,
     interval: PRICES.monthly.interval,
-    amount: centsFromDollars(PRICES.monthly.dollars),
+    amount: koboFromDollars(PRICES.monthly.dollars),
   },
   yearly: {
     name: PRICES.yearly.name,
     interval: PRICES.yearly.interval,
-    amount: centsFromDollars(PRICES.yearly.dollars),
+    amount: koboFromDollars(PRICES.yearly.dollars),
   },
 };
 

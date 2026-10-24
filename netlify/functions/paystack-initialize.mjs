@@ -60,9 +60,6 @@ export async function handler(event) {
       reference: started.data.reference,
     });
   } catch (err) {
-    const message = /currency/i.test(err.message || '')
-      ? 'Paystack is not accepting US dollars on this account yet. Enable USD in the Paystack dashboard, then try again.'
-      : (err.message || 'Could not start checkout');
-    return json(err.statusCode || 500, { error: message });
+    return json(err.statusCode || 500, { error: err.message || 'Could not start checkout' });
   }
 }
