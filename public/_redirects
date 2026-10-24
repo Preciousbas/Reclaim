@@ -1,3 +1,7 @@
 # Netlify SPA fallback — copied to dist/ on build (required for /landing, /signup, etc.)
-/api/chat  /.netlify/functions/chat  200
-/*         /index.html               200
+# This file overrides netlify.toml redirects, so API paths must be listed here.
+/api/chat                  /.netlify/functions/chat                  200
+/api/paystack/initialize   /.netlify/functions/paystack-initialize   200
+/api/paystack/verify       /.netlify/functions/paystack-verify       200
+/api/paystack/webhook      /.netlify/functions/paystack-webhook      200
+/*                         /index.html                               200
